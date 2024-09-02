@@ -1,0 +1,10 @@
+Flask==3.0.3
+Flask-Cors==4.0.1
+flasgger==0.9.7.1
+openai==0.28.0
+python-dotenv==1.0.1
+pymongo==4.8.0
+SQLAlchemy==2.0.32
+pyodbc==5.1.0
+gunicorn==20.1.0
+ 
