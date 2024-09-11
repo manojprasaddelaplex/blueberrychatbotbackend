@@ -14,7 +14,7 @@ load_dotenv(".env")
 
 os.environ['AZURE_CLIENT_ID']
 os.environ['AZURE_TENANT_ID']
-os.environ['AZURE_CLIENT_ID']
+os.environ['AZURE_CLIENTPWD_ID']
 
 endpoint = os.getenv("ENDPOINT_URL")
 deployment = os.getenv("DEPLOYMENT_NAME")
