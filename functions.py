@@ -85,7 +85,7 @@ def azure_search_openai(conversation_history):
               "type": "azure_search",
               "parameters": {
                 "endpoint": f"{search_endpoint}",
-                "index_name": "sqlviewindex",
+                "index_name": "allquestionindex",
                 "semantic_configuration": "default",
                 "query_type": "semantic",
                 "fields_mapping": {},
