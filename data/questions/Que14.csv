@@ -1,0 +1,4 @@
+question,sql
+"Give me details of person","select * from HcpPatients"
+"Give me details of patients","select * from HcpPatients"
+"Give me list of Patients","select * from HcpPatients"

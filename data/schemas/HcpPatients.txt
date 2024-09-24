@@ -1,0 +1,126 @@
+Database Schema Overview:
+
+1. **HcpPatients**
+   - **Columns:**
+     - Id: int
+     - DetainedPersonId: int (FK: DetainedPersons.Id)
+     - RegisteredByUserId: nvarchar(255)
+     - DateOfRegistration: datetimeoffset(7)
+     - Forename: nvarchar(max)
+     - Surname: nvarchar(max)
+     - DateOfBirth: datetimeoffset(7)
+     - Gender: nvarchar(max)
+     - Maintenance_MaritalStatusTypeId: int
+     - Maintenance_OccupationTypeId: int
+     - Maintenance_ReligionTypeId: int
+     - Maintenance_TitleTypeId: int
+     - Maintenance_EnglishSpeakerTypeId: int
+     - ArmedForcesTypeId: int (FK: Maintenance_ArmedForcesType.Id)
+     - PlaceOfDetentionTypeId: int
+     - Maintenance_EthnicityTypeId: int
+     - Maintenance_DisabilityTypeId: int
+     - Maintenance_GenderTypeId: int (FK: Maintenance_GenderType.Id)
+     - Maintenance_LanguageTypeId: int
+
+2. **DetainedPersons**
+   - **Columns:**
+     - Id: int
+     - Forename: nvarchar(max)
+     - MiddleName: nvarchar(max)
+     - Surname: nvarchar(max)
+     - DateOfBirth: datetimeoffset(7)
+     - Gender: nvarchar(max)
+     - Address: nvarchar(max) (fields: Address1, Address2, Town, City, County, Postcode)
+     - SexualOrientation: nvarchar(max)
+     - IsGenderSameAsRegisteredAtBirth: bit
+     - Archived: bit
+     - IsHcpSide: bit
+     - Maintenance_GenderTypeId: int (FK: Maintenance_GenderType.Id)
+
+3. **Maintenance Tables**
+   - **Maintenance_BreachReasonType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+   
+   - **Maintenance_CellType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+   - **Maintenance_HcpRequiredType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+   - **Maintenance_LocationAfterDischargeType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+   - **Maintenance_ReasonOfArrestType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+   - **Maintenance_ReferralFromType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+   - **Maintenance_RegistrationType**
+     - Id: int
+     - Name: nvarchar(max)
+     - Value: nvarchar(max)
+
+4. **PoliceForceLocations**
+   - **Columns:**
+     - Id: int
+     - Name: nvarchar(max)
+     - OdsCode: nvarchar(max)
+     - CreatedAt: datetimeoffset(7)
+     - PoliceForceId: int (FK: PoliceForces.Id)
+     - Address: nvarchar(max)
+     - PostCode: nvarchar(max)
+
+5. **PresentingComplaints**
+   - **Columns:**
+     - Id: int
+     - ReferralId: int (FK: Referrals.Id)
+     - ComplaintOther: nvarchar(max)
+     - HistoryOfPresentingComplaint: nvarchar(max)
+     - CreatedDate: datetimeoffset(7)
+
+6. **Referrals**
+   - **Columns:**
+     - Id: int
+     - ReferralDateTime: datetimeoffset(7)
+     - ReferredBy: nvarchar(max)
+     - CustodyNumber: nvarchar(max)
+     - RegistrationType: nvarchar(max)
+     - ReasonOfArrestOther: nvarchar(max)
+     - FmeRequired: bit
+     - VerballyPhysicallyAbusive: bit
+     - ThreatToFemaleStaff: bit
+     - DateAddedToWaitingList: datetimeoffset(7)
+     - State: nvarchar(max)
+     - CreatedByUserId: nvarchar(255)
+     - RecipientDetails: nvarchar(max)
+     - ReferralDetails: nvarchar(max)
+     - ReferralCreatedDateTime: datetimeoffset(7)
+     - CustodyLocationId: int (FK: PoliceForceLocations.Id)
+     - DetainedPersonId: int (FK: DetainedPersons.Id)
+     - PresentingComplaintId: int (FK: PresentingComplaints.Id)
+     - Various other fields including Maintenance and User IDs
+
+7. **PoliceForces**
+   - **Columns:**
+     - Id: int
+     - Name: nvarchar(max)
+     - Address: nvarchar(max)
+     - PostCode: nvarchar(max)
+
+Notes:
+- **FK** indicates a foreign key relationship to another table's primary key.
+- Each maintenance type table is structured similarly, containing identifiers and descriptive fields.
+- Fields have been grouped logically to enhance readability.

@@ -1,0 +1,1939 @@
+question,sql
+From these results can you tell me the presenting compliant breakdown?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide the breakdown of presenting complaints from these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint breakdown from these data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you tell me the main presenting complaints based on the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What were the primary presenting complaints from the individuals in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give me a breakdown of the presenting complaints from these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the presenting complaints shown in the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Could you share the presenting complaint distribution from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the breakdown of presenting complaints based on this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide a detailed analysis of presenting complaints from these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the common presenting complaints from these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you share the key presenting complaints identified in the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What were the main presenting complaints from individuals in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide the presenting complaint statistics from this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint breakdown from the individuals seen?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you analyze the presenting complaints from these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the top presenting complaints from the cases in the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give me the distribution of presenting complaints from this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the presenting complaints identified in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you tell me the most common presenting complaints from the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint analysis based on these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide a breakdown of the types of presenting complaints from these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the top presenting complaints seen in the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give a detailed breakdown of presenting complaints from these individuals?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint distribution from the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you analyze the main presenting complaints from the cases in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the presenting complaint trends identified in the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you share the most frequent presenting complaints from these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the breakdown of complaints presented by individuals from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide a list of the main presenting complaints from this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the presenting complaints observed in the cases from the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give me a detailed breakdown of the presenting complaints in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the primary presenting complaint breakdown from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide the presenting complaint distribution based on this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What were the presenting complaints identified in these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you tell me the top presenting complaints from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the breakdown of presenting complaints among individuals in these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give a detailed presenting complaint analysis from these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the key presenting complaints based on this data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide a breakdown of presenting complaints observed in the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the most common presenting complaints from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide the main presenting complaint breakdown from these results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint summary from the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you analyze the presenting complaints found in these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What are the most frequent presenting complaints from the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you provide the presenting complaint data from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What were the top presenting complaints based on the results?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you give a breakdown of the presenting complaints identified in the data?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the presenting complaint distribution in these cases?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+Can you analyze the presenting complaints from these individuals?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"
+What is the main presenting complaint breakdown from these findings?,"WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+)
+SELECT * FROM (
+	SELECT 
+		PresentingComplaints, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate],[Unspecified/Unknown])
+) AS PivotTable;
+"

@@ -1,0 +1,4132 @@
+question,sql
+What is the estimated number of referrals for the next two years over the same weekend based on current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you project the referral numbers for the same weekend over the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What would be the predicted referral count for the same weekend in the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+"Based on current trends, what’s the estimated referral total for the same weekend over the next two years?","WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you estimate the referral figures for the same weekend for the next two years using the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals are expected for the same weekend in the next two years based on current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What are the projected referral numbers for the same weekend over the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals would be estimated for the same weekend in the next two years based on trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you predict the number of referrals over the next two years for the same weekend based on current trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the forecasted referral count for the same weekend in the next two years using current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals should be expected for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you project referral numbers for the next two years on the same weekend using historical data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the estimated referral total for the same weekend in the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals can be expected on the same weekend over the next two years based on data trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you forecast the referral count for the next two years over the same weekend?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+"Based on historical data, what’s the estimated referral figure for the same weekend over the next two years?","WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What would be the expected referral count for the same weekend over the next two years using current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you predict how many referrals there will be for the same weekend over the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals are likely to occur over the same weekend for the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the estimated referral number for the same weekend in the next two years using the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+"Based on current trends, what is the predicted number of referrals for the same weekend over the next two years?","WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you estimate the referral count for the same weekend in the next two years using trend data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What are the predicted referral numbers for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals should be expected for the next two years on the same weekend?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you project referral totals for the same weekend over the next two years using the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals are estimated for the same weekend over the next two years based on current patterns?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What would be the estimated referral count for the same weekend in the next two years based on trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you forecast referral numbers for the same weekend over the next two years using data analysis?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the expected referral number for the same weekend in the next two years based on current trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals will likely be made for the same weekend over the next two years according to the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you provide an estimate of the referral count for the same weekend over the next two years?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What are the projected referral numbers for the next two years for the same weekend based on trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals would be expected for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What’s the predicted referral count for the same weekend in the next two years using historical data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you estimate the total number of referrals for the next two years for the same weekend based on current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the forecasted referral figure for the next two years for the same weekend using the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals should be projected for the same weekend over the next two years according to trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you estimate the referral numbers for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What are the expected referral figures for the next two years over the same weekend?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals are predicted for the next two years for the same weekend based on trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you forecast the number of referrals for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the estimated referral total for the next two years on the same weekend based on historical data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals should be expected for the next two years over the same weekend based on current data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you predict the referral numbers for the same weekend in the next two years using trend analysis?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the expected number of referrals for the same weekend over the next two years based on data trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals are likely to be made for the next two years on the same weekend based on the data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you provide an estimated referral count for the same weekend over the next two years using trend data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+What is the projected referral number for the next two years for the same weekend using data analysis?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+How many referrals should be expected for the same weekend over the next two years using current trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+Can you provide a forecast of referral numbers for the same weekend over the next two years based on historical data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"
+If looking at the data what would be the estimated number for referrals for the next two years over the same weekend,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        YEAR(DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))) AS Year,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 11 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+, ThisWeekend AS (
+    SELECT 
+        MAX(WeekendStart) AS ThisWeekendStart,
+        (SELECT TOP 1 ReferralCount FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendReferrals,
+        (SELECT TOP 1 Year FROM WeekendData ORDER BY WeekendStart DESC) AS ThisWeekendYear
+    FROM WeekendData
+)
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+-- Calculate the projection for the next two years
+, FutureProjections AS (
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 1 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.05 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 5% growth
+    FROM ThisWeekend
+    UNION ALL
+    SELECT 
+        ThisWeekend.ThisWeekendYear + 2 AS ProjectedYear,
+        CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
+    FROM ThisWeekend
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.ThisWeekendReferrals AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    ThisWeekend.ThisWeekendYear AS Year,
+    CASE 
+        WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.ThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends
+
+UNION ALL
+
+SELECT 
+    FutureProjections.ProjectedReferralCount AS Referrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    FutureProjections.ProjectedYear AS Year,
+    CASE 
+        WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN FutureProjections.ProjectedReferralCount < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    FutureProjections,
+    PreviousWeekends
+
+ORDER BY Year;
+"

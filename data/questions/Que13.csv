@@ -1,0 +1,664 @@
+question,sql
+How many military veterans have been seen by healthcare from the 1st of January 2024 and referred to a suitable Military Veterans pathway?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many military veterans have been seen by healthcare since January 1st, 2024, and referred to a Military Veterans pathway?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you tell me the number of military veterans seen by healthcare since January 2024 and referred to the Military Veterans pathway?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been referred to the Military Veterans pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+What is the number of military veterans seen by healthcare and referred to a Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been seen by healthcare and referred to the Military Veterans pathway from January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you provide the number of military veterans referred to a suitable pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been identified by healthcare and referred to a Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total number of military veterans seen by healthcare and referred to a pathway for veterans since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you tell me how many military veterans were referred to the Veterans pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many military veterans have been seen by healthcare and sent to a Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the count of veterans seen by healthcare and referred to the Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been seen by healthcare and referred to a suitable Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you provide the number of military veterans who were referred to a specific Veterans pathway after being seen by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been referred to the Military Veterans pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you tell me how many military veterans have been seen by healthcare and referred to a suitable pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many military veterans have been referred to a pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you give me the number of veterans who were referred to a Military Veterans pathway after being seen by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been referred to a Military Veterans pathway after being seen by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total number of military veterans referred to the Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you provide the count of veterans referred to a suitable pathway for military veterans after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been seen by healthcare and referred to a Military Veterans pathway since the start of January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total count of military veterans referred to a pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you give me the number of veterans referred to a suitable pathway for military veterans since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been seen by healthcare and referred to a Military Veterans pathway since the beginning of 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you tell me how many veterans have been referred to the Military Veterans pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many military veterans have been referred to a suitable pathway by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total number of veterans seen by healthcare and referred to a Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you provide the count of veterans referred to a Military Veterans pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many military veterans have been seen by healthcare and referred to the Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total number of veterans referred to a suitable Military Veterans pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been seen by healthcare and referred to a Military Veterans pathway since the start of January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you give me the count of veterans who have been seen by healthcare and referred to a Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+What is the number of veterans referred to a suitable Military Veterans pathway after being seen by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been referred to a Military Veterans pathway by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the count of military veterans referred to a suitable pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been referred to the Military Veterans pathway by healthcare since the beginning of January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the number of veterans seen by healthcare and referred to a Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been seen by healthcare and referred to the Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you tell me how many veterans have been referred to a suitable Military Veterans pathway by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total count of military veterans seen by healthcare and referred to the Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been seen by healthcare and referred to a suitable pathway for veterans since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+Can you give me the count of veterans who were referred to a Military Veterans pathway since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"What is the total number of military veterans referred to a suitable Veterans pathway by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+How many veterans have been referred to the Military Veterans pathway by healthcare since the start of January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+What is the total number of military veterans referred to a pathway after being seen by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you provide the count of military veterans referred to a Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"How many veterans have been referred to the Military Veterans pathway since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+What is the total number of veterans referred to a suitable pathway by healthcare since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+"Can you tell me how many military veterans have been referred to a pathway after being seen by healthcare since January 1st, 2024?","SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"
+What is the count of veterans referred to a suitable pathway for military veterans since January 2024?,"SELECT
+	r.DetainedPersonId,
+	CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+	gt.[Name] AS Gender,
+	aft.[Name] AS ArmedForce
+FROM Referrals r
+JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+JOIN Maintenance_ArmedForcesType aft ON aft.Id = hp.ArmedForcesTypeId
+WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' AND CAST(GETDATE() AS DATE)
+	AND hp.ArmedForcesTypeId  in (1,2)
+GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name], aft.[Name];
+"

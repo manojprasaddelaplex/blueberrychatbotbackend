@@ -2,7 +2,7 @@
 main_swagger = {
     'summary': 'Process user query to generate SQL and retrieve results.',
     'description': 'This endpoint processes the user query to generate an SQL statement using OpenAI, executes it against the database, and returns results in various formats such as text, table, chart, or graph.',
-    'tags': ['Sending User Question'],
+    'tags': ['Sending User Question to Chatbot SONAR'],
     'parameters': [
         {
             'name': 'query',

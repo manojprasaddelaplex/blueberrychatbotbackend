@@ -1,0 +1,1633 @@
+question,sql
+What is the estimated service credit for this case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide the estimated service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much would the service credit be estimated at?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the projected service credit in this situation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you tell me the estimated amount of service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would be the total estimated service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you estimate the service credit for this period?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the expected service credit for this case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit should be estimated?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you calculate the estimated service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the potential service credit estimate?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much would the service credit likely be?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the forecasted service credit amount?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide an estimate for the service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would be the service credit based on current data?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit is estimated for this breach?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you estimate the amount of service credit we’re looking at?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the approximate service credit expected?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you give an estimation of the service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would the estimated service credit amount be?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much would the service credit likely total?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide the projected service credit for this situation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the estimated service credit for this specific case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would the total service credit estimate be?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide the estimated service credit for this period?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the expected amount of service credit for this case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you tell me the calculated service credit estimate?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would be the projected service credit for this breach?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit is expected based on the current data?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the total service credit likely to be?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide an estimated service credit figure?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit would be estimated in this scenario?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the estimated service credit for the given breach?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide the expected service credit estimate?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the estimated service credit amount for this case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you calculate the likely service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit do you estimate for this situation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the estimated service credit calculation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much is the projected service credit expected to be?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide an estimate of service credit for this case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would be the approximate service credit based on current data?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit should be expected in this instance?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the estimated service credit based on the breach?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you estimate the service credit for this scenario?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What is the expected service credit for this specific case?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit can we estimate in this situation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What’s the likely amount of service credit for this period?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you estimate the total service credit for this situation?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+How much service credit is projected for this breach?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+Can you provide the estimated service credit amount?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"
+What would be the estimated service credit?,"WITH WeekendData AS (
+    SELECT 
+        DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME)) AS Friday0600AM,
+        DATEADD(DAY, 3, 
+                DATEADD(HOUR, 6, 
+                CAST(DATEADD(DAY, 
+                             -((DATEPART(WEEKDAY, GETDATE()) + @@DATEFIRST - 6) % 7), 
+                             CAST(GETDATE() AS DATE)) AS DATETIME))) AS Monday0600AM
+),
+ReferralStats AS (
+    SELECT 
+        COUNT(*) AS TotalReferrals,
+        SUM(CASE WHEN BreachReasonDateTime IS NOT NULL THEN 1 ELSE 0 END) AS TotalBreaches
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= (SELECT Friday0600AM FROM WeekendData)
+      AND ReferralCreatedDateTime < (SELECT Monday0600AM FROM WeekendData)
+)
+SELECT 
+    TotalReferrals,
+    TotalBreaches,
+    (TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals AS SLA_Achieved_Percentage,
+    98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) AS PercentagePointsAwayFromTarget,
+    CASE 
+        WHEN ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals) < 98 THEN 
+            (98.0 - ((TotalReferrals - TotalBreaches) * 100.0 / TotalReferrals)) * 300.00
+        ELSE 0.00
+    END AS ServiceCredit
+FROM ReferralStats;
+"

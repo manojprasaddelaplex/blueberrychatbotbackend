@@ -1,0 +1,2701 @@
+question,sql
+"Can you categorize this presenting complaint into Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you divide this presenting complaint between Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you separate this presenting complaint into Physical Health, Mental Health, and Other areas?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you break this presenting complaint down into Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can this presenting complaint be split between Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Would you mind splitting this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you classify this presenting complaint into Physical Health, Mental Health, and Other sections?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can this presenting complaint be divided into Physical Health, Mental Health, and Other aspects?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you organize this presenting complaint under Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Please divide this presenting complaint into the categories of Physical Health, Mental Health, and Other.","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can you split this presenting complaint into Physical Health, Mental Health, and Other sections?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you assign this presenting complaint to Physical Health, Mental Health, or Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Would you break down this presenting complaint into Physical Health, Mental Health, and Other types?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you split this presenting complaint into Physical Health, Mental Health, and Other groups?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you organize this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you classify this presenting complaint under Physical Health, Mental Health, and Other areas?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Would you mind dividing this presenting complaint into Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you categorize this presenting complaint between Physical Health, Mental Health, and Other factors?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you allocate this presenting complaint to Physical Health, Mental Health, or Other sections?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can this presenting complaint be split into Physical Health, Mental Health, and Other classifications?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you organize this presenting complaint according to Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you break down this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you place this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you classify this presenting complaint under Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you group this presenting complaint into Physical Health, Mental Health, and Other areas?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you assign categories of Physical Health, Mental Health, and Other to this presenting complaint?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you distribute this presenting complaint between Physical Health, Mental Health, and Other groups?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you separate the presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Please categorize this presenting complaint under Physical Health, Mental Health, and Other headings.","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can you organize this presenting complaint into Physical Health, Mental Health, and Other segments?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you allocate this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you split this presenting complaint between Physical Health, Mental Health, and Other domains?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you classify this presenting complaint into Physical Health, Mental Health, and Other sections?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you categorize this presenting complaint into Physical Health, Mental Health, and Other types?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Would you mind organizing this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can you divide this presenting complaint between Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you allocate this presenting complaint into Physical Health, Mental Health, and Other groups?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you classify this presenting complaint under Physical Health, Mental Health, and Other aspects?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can this presenting complaint be categorized into Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you group this presenting complaint into Physical Health, Mental Health, and Other areas?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you arrange this presenting complaint into Physical Health, Mental Health, and Other classifications?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you distribute this presenting complaint between Physical Health, Mental Health, and Other factors?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you split this presenting complaint under Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you divide this presenting complaint into Physical Health, Mental Health, and Other classifications?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you arrange this presenting complaint into categories like Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How can you split this presenting complaint into the categories of Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Would you classify this presenting complaint under Physical Health, Mental Health, and Other areas?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"How would you separate this presenting complaint into Physical Health, Mental Health, and Other categories?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Could you break this presenting complaint into the categories of Physical Health, Mental Health, and Other?","WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"
+"Can you categorize this presenting complaint between Physical Health, Mental Health, and Other segments?""WITH PatientsSeenByCustodyHealthcare AS (
+	SELECT
+		r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+		COUNT(*) AS NumberOfVisits
+	FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+	WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+	GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+),
+PatientPresentingComplaints AS (
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints,
+		ct.[Value] AS PresentingComplaintValue,
+		CASE
+			WHEN ct.[Value] is null THEN null 
+			WHEN ct.[Value] in (2, 5, 24) THEN 'Mental Health' 
+			WHEN ct.[Value] in (1, 3, 4, 7, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 23, 25, 27) THEN 'Physical Health' 
+			WHEN ct.[Value] in (20, 22, 26, 28) THEN 'Other' 
+			ELSE 'Unknown' 
+		END AS PresentingComplaintCategory
+    FROM PatientsSeenByCustodyHealthcare rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name], ct.[Value]
+), 
+PatientsPresentingComplaintCategories AS (
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	PresentingComplaintCategory
+	FROM PatientPresentingComplaints
+	GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits, PresentingComplaintCategory
+) 
+SELECT * FROM (
+	SELECT 
+		PresentingComplaintCategory, 
+		Gender  
+	FROM PatientPresentingComplaints
+	WHERE PresentingComplaints IS NOT NULL
+)
+AS SourceTable PIVOT(COUNT(Gender) FOR
+	[Gender] IN ([Male], [Female], [Indeterminate], [Unspecified/Unknown])
+) AS PivotTable;"

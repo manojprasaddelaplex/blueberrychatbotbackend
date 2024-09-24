@@ -1,0 +1,63 @@
+Database Schema Overview:
+
+1. **Medications (med)**
+   - **Columns:**
+     - Id: int
+     - ReferralId: int (nullable, FK: Referrals.Id)
+     - DrugName: nvarchar(max) (nullable)
+     - Dose: nvarchar(max) (nullable)
+     - DoseForm: nvarchar(max) (nullable)
+     - UpMaximumPerAdministration: nvarchar(max) (nullable)
+     - Route: nvarchar(max) (nullable)
+     - AdminDateTime: datetimeoffset(7) (nullable)
+     - TotalGiven: nvarchar(max) (nullable)
+     - Instructions: nvarchar(max) (nullable)
+     - Notes: nvarchar(max) (nullable)
+     - ADRDescription: nvarchar(max) (nullable)
+     - Administered: bit (not nullable)
+     - MedicationType: int (nullable)
+     - CreatedDateTime: datetimeoffset(7) (not nullable, default: '0001-01-01T00:00:00.0000000+00:00')
+     - AgeGroup: int (not nullable, default: 0)
+     - Duration: int (not nullable)
+     - Frequency: nvarchar(max) (nullable)
+     - Quantity: nvarchar(max) (nullable)
+     - PgdId: int (nullable)
+     - Prescribed: bit (not nullable, default: 0)
+     - ProductId: nvarchar(max) (nullable)
+     - PgdDocumentId: int (nullable, FK: FilesDetails.Id, ON DELETE SET NULL)
+     - CreatedByUserId: nvarchar(255) (nullable, FK: AspNetUsers.Id)
+     - IsContraindicationSeen: bit (nullable)
+     - IsProductWarningSeen: bit (nullable)
+     - AdministerFrequency: int (nullable)
+     - AdministerValidationDuration: int (nullable)
+     - IsSingleDose: bit (not nullable, default: 0)
+     - MaximumAdministerLimit: int (nullable)
+     - MaximumQuantity: decimal(18, 2) (nullable)
+     - Recommendation: nvarchar(max) (nullable)
+     - VoidedMedicationId: int (nullable, FK: VoidedMedication.Id, ON DELETE SET NULL)
+
+2. **PoliceForceLocations (location)**
+   - **Columns:**
+     - Id: int
+     - Name: nvarchar(max) (nullable)
+     - OdsCode: nvarchar(max) (nullable)
+     - CreatedAt: datetimeoffset(7) (not nullable)
+     - PoliceForceId: int (not nullable, FK: PoliceForces.Id, ON DELETE CASCADE)
+     - Address: nvarchar(max) (nullable)
+     - PostCode: nvarchar(max) (nullable)
+
+3. **PoliceForces (police custody)**
+   - **Columns:**
+     - Id: int
+     - Name: nvarchar(max) (nullable)
+     - LastUpdatedAt: datetimeoffset(7) (not nullable)
+     - LastUpdatedBy: nvarchar(max) (nullable)
+     - LastUpdatedFullName: nvarchar(max) (nullable)
+     - Address: nvarchar(max) (nullable)
+     - PostCode: nvarchar(max) (nullable)
+     - CreatedByUserId: nvarchar(255) (nullable, FK: AspNetUsers.Id)
+
+Notes:
+- **FK** indicates a foreign key relationship to another table's primary key.
+- Fields that are nullable are explicitly marked as such.
+- Tables are grouped logically to enhance readability.

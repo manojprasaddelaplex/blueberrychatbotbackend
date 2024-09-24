@@ -1,0 +1,1990 @@
+question,sql
+From all the data available can you detail the people who have been seen by healthcare more than three times since 1st January to today and break down their demographics and presenting complaints.  List the people from higher to lower in repeat visits.,"WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you list people seen by healthcare more than three times since January 1st, ranked by visit count, with demographics and presenting complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times since January, and can you break down their demographics and presenting complaints, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide a breakdown of people seen by healthcare more than three times, with demographics and complaints, listed from most to least visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare more than three times since January 1st, and what are their demographics and presenting complaints, sorted by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you detail individuals seen more than three times by healthcare since January 1st, along with their demographics and presenting complaints, ranked by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"List the people who have been seen by healthcare more than three times, from highest to lowest visits, along with their demographics and complaints.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide a detailed report of individuals seen by healthcare more than three times, including demographics and presenting complaints, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the repeat patients seen more than three times by healthcare, and what are their demographics and complaints, listed by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you detail the demographics and presenting complaints of people seen more than three times by healthcare since January 1st, sorted by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare multiple times since January 1st, and can you break down their demographics and presenting complaints, ranked by visit count?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you list the people who have been seen by healthcare more than three times, ranked by visits, and include their demographics and presenting complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Provide a detailed report of individuals seen by healthcare more than three times since January 1st, including demographics and complaints, listed by repeat visits.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you give me a breakdown of people seen by healthcare more than three times, including their demographics and presenting complaints, sorted by visit count?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has had more than three healthcare visits since January 1st, and can you detail their demographics and presenting complaints, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide a list of people seen more than three times by healthcare, along with their demographics and complaints, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times, and can you break down their demographics and complaints, listed from most to least visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Provide a list of individuals seen by healthcare more than three times, with demographics and presenting complaints, ranked by the number of visits.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare more than three times since January 1st, and what are their demographics and complaints, sorted by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you give a detailed breakdown of people seen by healthcare more than three times, including their demographics and complaints, listed by visit count?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the repeat patients seen by healthcare more than three times, and what are their demographics and presenting complaints, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you detail the demographics and complaints of individuals seen by healthcare more than three times since January 1st, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"List the people seen by healthcare more than three times since January 1st, with their demographics and presenting complaints, ranked by visit frequency.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide the demographics and presenting complaints of those seen more than three times by healthcare, ranked by the number of visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare more than three times since January 1st, and can you detail their demographics and presenting complaints, sorted by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you break down the people seen by healthcare more than three times, ranked by visits, and include their demographics and complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Provide a detailed list of individuals seen by healthcare more than three times since January 1st, with their demographics and complaints, ranked by visit count.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you share the demographics and presenting complaints of people seen by healthcare more than three times, ranked by frequency of visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare more than three times, and what are their demographics and complaints, listed by visit frequency since January 1st?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you give a report on individuals seen by healthcare more than three times, with demographics and presenting complaints, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times since January 1st, and can you provide their demographics and presenting complaints, ranked by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you break down the demographics and complaints of people seen more than three times by healthcare, sorted by the number of visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"List the people who have had more than three healthcare visits since January 1st, with their demographics and presenting complaints, ranked by visit count.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide the demographics and presenting complaints of individuals seen by healthcare more than three times, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times since January 1st, and what are their demographics and complaints, sorted by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you detail the people seen by healthcare more than three times, ranked by visit count, and include their demographics and presenting complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Provide a breakdown of individuals seen more than three times by healthcare since January 1st, with their demographics and complaints, ranked by frequency of visits.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you give a detailed report of individuals seen by healthcare more than three times, including their demographics and complaints, listed by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has been seen by healthcare more than three times since January 1st, and can you provide their demographics and presenting complaints, sorted by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you list the people who have been seen by healthcare more than three times, ranked by the number of visits, and include their demographics and complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times, and can you break down their demographics and complaints, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide the demographics and presenting complaints of individuals seen by healthcare more than three times since January 1st, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"List the people seen by healthcare more than three times, with their demographics and complaints, ranked by frequency of visits since January 1st.","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you detail the demographics and presenting complaints of those seen more than three times by healthcare, ranked by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals with more than three healthcare visits since January 1st, and what are their demographics and complaints, listed by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide a breakdown of people seen by healthcare more than three times since January 1st, ranked by visit count, with their demographics and complaints?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who has had more than three healthcare visits since January 1st, and what are their demographics and presenting complaints, sorted by visit frequency?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you list individuals seen by healthcare more than three times, along with their demographics and presenting complaints, ranked by frequency of visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the people seen by healthcare more than three times since January 1st, and what are their demographics and complaints, ranked by repeat visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Can you provide the demographics and presenting complaints of those seen more than three times by healthcare, listed from most to least visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"
+"Who are the individuals seen by healthcare more than three times, and can you give a breakdown of their demographics and presenting complaints, ranked by visits?","WITH ReferralCounts AS (
+    -- Calculate the number of visits for each patient since January 1st, 2024 and get the patient details
+    SELECT
+        r.DetainedPersonId,
+		CONCAT(hp.Forename, ' ', hp.MiddleName, ' ', hp.Surname) AS FullName,
+		gt.[Name] AS Gender,
+        COUNT(*) AS NumberOfVisits
+    FROM Referrals r
+	JOIN HcpPatients hp ON r.DetainedPersonId = hp.DetainedPersonId
+	JOIN Maintenance_GenderType gt ON gt.Id = hp.Maintenance_GenderTypeId
+    WHERE CAST(r.ReferralCreatedDateTime AS DATE) BETWEEN '2024-01-01' and CAST(GETDATE() AS DATE)
+    GROUP BY r.DetainedPersonId, hp.Forename, hp.MiddleName, hp.Surname, gt.[Name]
+    HAVING COUNT(*) > 3
+),
+PatientPresentingComplaints AS (
+	-- Get the presenting complaint types of each patient
+    SELECT
+		rc.DetainedPersonId,
+		rc.FullName,
+		rc.Gender,
+		rc.NumberOfVisits,
+		ct.[Name] AS PresentingComplaints
+    FROM ReferralCounts rc
+    LEFT JOIN Referrals r ON r.DetainedPersonId = rc.DetainedPersonId
+    LEFT JOIN PresentingComplaintHistory pch ON r.Id = pch.ReferralId
+	LEFT JOIN ComplaintsHistory ch ON ch.PresentingComplaintHistoryId = pch.Id
+	LEFT JOIN Maintenance_ComplaintType ct on ct.Id = ch.Maintenance_ComplaintTypeId
+	GROUP BY rc.DetainedPersonId, rc.FullName, rc.Gender, rc.NumberOfVisits, ct.[Name]
+) 
+SELECT
+	DetainedPersonId,
+	FullName,
+	Gender,
+	NumberOfVisits,
+	STRING_AGG(PresentingComplaints, ', ')  AS PresentingComplaints
+FROM PatientPresentingComplaints
+GROUP BY DetainedPersonId, FullName, Gender, NumberOfVisits
+ORDER BY NumberOfVisits DESC;
+"

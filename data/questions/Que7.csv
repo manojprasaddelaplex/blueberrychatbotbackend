@@ -1,0 +1,2151 @@
+question,sql
+What caused these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain the reasons for these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the main causes of these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the reasons behind the referral breaches during this period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you provide details on why these referral breaches occurred?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What factors contributed to these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What was the cause for the referral breaches between Friday and Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you tell me why these referral breaches happened?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What led to these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What are the reasons for the referral breaches from Friday to Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain the causes of the referral breaches reported?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the contributing factors to these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What caused the referral breaches during the period from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you tell me the cause of these breaches in referral conditions?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What was the underlying reason for the referral breaches during this time?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What led to the referral breaches in this timeframe?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you provide reasons for the referral breaches that occurred?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the causes behind the referral breaches from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Why did these referral breaches occur?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you give me an explanation for the causes of these breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the primary reasons for the referral breaches from Friday to Monday morning?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you tell me what caused the referral breaches during this time period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the reasons for these referral breaches over the weekend?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain what caused these breaches in referrals?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What factors led to the referral breaches between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Why did the referral breaches occur during this period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What are the causes of the referral breaches from Friday to Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you provide information on the reasons behind the referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What caused these breaches in referral conditions between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What led to the referral breaches over the weekend?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain the causes for the breaches reported during this period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the main reasons for the referral breaches that occurred?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What was the cause of these referral breaches from Friday to Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you share details on why the referral breaches occurred during this period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What contributed to the referral breaches from Friday until 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you tell me the reason behind these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the factors that caused the referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you provide reasons for why these referral breaches occurred?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What was the underlying cause of these referral breaches from Friday to Monday morning?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain the reasons for the breaches in referrals over this weekend?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What led to these breaches in referral conditions from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the reasons for the referral breaches between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you tell me the cause of these referral breaches that occurred?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the contributing factors to the referral breaches between Friday and Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Why did these breaches in referrals happen from Friday to Monday morning?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you explain the cause behind these referral breaches?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What was the reason for the referral breaches during the period from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+Can you provide details on what led to the referral breaches from Friday to Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What were the reasons behind the referral breaches over this period?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"
+What caused the referral breaches between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+SELECT
+    lw.WeekendStart,
+	bt.Name
+
+   -- COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+ 
+FROM LastWeekend lw
+ 
+LEFT JOIN Referrals r
+ 
+    ON r.ReferralCreatedDateTime >= lw.WeekendStart
+ 
+    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+ 
+    AND (
+ 
+        -- Capture Fridays through Mondays before 6 AM
+ 
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+ 
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+ 
+        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+ 
+		
+    )
+	 JOIN Maintenance_BreachReasonType bt
+	ON bt.id = r.BreachReasonId
+	AND r.BreachReasonId is NOT null
+--GROUP BY
+ 
+    --lw.WeekendStart
+ 
+ORDER BY
+ 
+    lw.WeekendStart;
+"

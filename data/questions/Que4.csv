@@ -1,0 +1,2908 @@
+question,sql
+How do this weekend’s referral numbers compare to the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend’s referrals to the average over the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What’s the difference between this weekend’s referral data and the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do the referrals from this weekend stack up against the last 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you show a comparison of this weekend’s referrals to the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral count compare to the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences between this weekend’s referrals and the average for the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare the referral numbers from this weekend to the previous 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+"How do this weekend’s referrals compare to the monthly average for the past 11 months?""","WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What is the referral trend for this weekend compared to the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison of referral numbers from this weekend to the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral volume compare to the average over the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences in referral counts between this weekend and the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you show how this weekend’s referral data compares to the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral count compare to the last 11 months of statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do this weekend’s referrals compare to the previous 11 months’ trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison of this weekend’s referrals to the average from the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does the referral data from this weekend stack up against the previous 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What is the difference between this weekend’s referrals and the referral average over the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend’s referral numbers to the previous 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does the referral count from this weekend compare to the monthly referral average for the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences in referral data between this weekend and the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do the referral numbers from this weekend compare to the last 11 months’ trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare the referral statistics from this weekend to the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do this weekend’s referrals compare to the last 11 months of referral statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison between this weekend’s referral count and the past 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral data compare to the average over the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences between this weekend’s referrals and the previous 11 months’ data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you show a comparison of this weekend’s referral numbers to the average from the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do this weekend’s referrals compare to the monthly referral trends over the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare the referral numbers for this weekend to the last 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does the referral count from this weekend stack up against the past 11 months of referral data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences between this weekend’s referral data and the trends from the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison of this weekend’s referrals to the past 11 months of referral statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral data compare to the referral average over the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do this weekend’s referral numbers compare to the previous 11 months of referral statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend’s referral count to the last 11 months of referral trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does the referral data from this weekend stack up against the last 11 months’ data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison between this weekend’s referrals and the past 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do the referral numbers from this weekend compare to the monthly referral trends over the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences between this weekend’s referral data and the last 11 months of referral statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend’s referral numbers to the average referral count from the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral count compare to the previous 11 months of referral data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What’s the difference between this weekend’s referrals and the past 11 months of referral statistics?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison of referral numbers for this weekend against the last 11 months of data?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How do this weekend’s referrals compare to the previous 11 months of referral trends?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+How does this weekend’s referral data compare to the monthly referral averages over the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend’s referral count to the referral averages from the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+What are the differences between this weekend’s referral data and the average from the previous 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you provide a comparison of referral statistics for this weekend against the last 11 months?,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
+Can you compare this weekend referral numbers to the previous 11 months of data please,"WITH WeekendData AS (
+    SELECT 
+        -- Identify each weekend by its Friday date
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE)) AS WeekendStart,
+        COUNT(*) AS ReferralCount
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(MONTH, -11, GETDATE()) -- Only look at the past 2 months
+      AND (
+            -- Capture Fridays through Mondays at 6 AM
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7) -- Saturday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1) -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+    GROUP BY 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, ReferralCreatedDateTime) + 1) % 7), CAST(ReferralCreatedDateTime AS DATE))
+)
+-- Calculate this weekend's referrals
+,ThisWeekend AS (
+    SELECT 
+        DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS ThisWeekendStart, 
+        COUNT(*) AS TotalThisWeekendReferrals
+    FROM Referrals
+    WHERE ReferralCreatedDateTime >= DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) -- Start at this Friday
+      AND ReferralCreatedDateTime < DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE))) -- End at Monday 23:59
+      AND (
+            DATEPART(WEEKDAY, ReferralCreatedDateTime) = 6 -- Friday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 7 -- Saturday
+            OR DATEPART(WEEKDAY, ReferralCreatedDateTime) = 1 -- Sunday
+            OR (DATEPART(WEEKDAY, ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+          )
+)
+
+
+-- Calculate the average referrals for the previous weekends
+, PreviousWeekends AS (
+    SELECT 
+        CAST(AVG(CAST(ReferralCount AS DECIMAL(10, 2))) AS DECIMAL(10, 2)) AS AvgPreviousWeekendReferrals
+    FROM WeekendData
+    WHERE WeekendStart < (SELECT ThisWeekendStart FROM ThisWeekend)
+)
+
+-- Combine and compare the results
+SELECT 
+    ThisWeekend.TotalThisWeekendReferrals,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
+    CASE 
+        WHEN ThisWeekend.TotalThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Above Average'
+        WHEN ThisWeekend.TotalThisWeekendReferrals < PreviousWeekends.AvgPreviousWeekendReferrals 
+            THEN 'Below Average'
+        ELSE 'Equal to Average'
+    END AS ComparisonResult
+FROM 
+    ThisWeekend,
+    PreviousWeekends;
+"
