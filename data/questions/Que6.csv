@@ -3,1223 +3,1376 @@ How many referral breaches occurred from Friday to 0600hrs on Monday?,"WITH Last
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the number of referral breaches from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches of referrals were reported between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What’s the total number of referral breaches from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you tell me how many referral breaches occurred from Friday to Monday morning at 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches in referrals were recorded between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the referral breach count from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches of referrals were there from Friday through 0600hrs on Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you share the referral breach numbers from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What was the total number of referral breaches reported from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the breach count for referrals between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches were reported from Friday to Monday 0600hrs in the force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What’s the total number of referral breaches between Friday and Monday morning at 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you tell me the number of referral breaches that occurred between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches have been recorded from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the number of referral breaches reported from Friday to Monday at 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the referral breach count from Friday through to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches of referral conditions were reported from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the total count of referral breaches from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches have occurred between Friday and Monday 0600hrs in the force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you tell me how many referral breaches were recorded from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches were reported between Friday and Monday 0600hrs in our force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the referral breach count from Friday to Monday morning 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the number of referral breaches from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches of referrals were logged between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What was the total referral breach number from Friday until 0600hrs on Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches occurred from Friday to 0600hrs Monday in the force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you give me the number of referral breaches from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches in referral conditions occurred between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What’s the total referral breach count from Friday to Monday morning 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches were reported from Friday until Monday morning 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the referral breach figures from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches of referral conditions were logged between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the referral breach count from Friday to Monday 0600hrs in our force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches were recorded between Friday and Monday morning 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you tell me how many referral breaches have occurred from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What’s the total number of referral breaches recorded between Friday and 0600hrs on Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches in referral conditions occurred from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you share the number of referral breaches from Friday until Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches were reported from Friday to Monday at 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the total referral breach count from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches in referrals occurred from Friday through Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you provide the referral breach count between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many breaches in referrals were logged from Friday to Monday morning at 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you share the referral breach numbers for the period from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches occurred from Friday until 0600hrs Monday in the force area?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What is the number of breaches in referral conditions from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 Can you tell me how many breaches of referral conditions were recorded from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 How many referral breaches have been logged from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 What’s the total count of referral breaches from Friday to Monday morning 0600hrs?,"WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "
 "From Friday to 0600hrs on Monday, can you tell me how many referral breaches we have?","WITH LastWeekend AS (
     -- Calculate the previous Friday (even if today is after Monday)
     SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
+ 
 SELECT
-    lw.WeekendStart,
-    COUNT(r.ReferralCreatedDateTime) AS ReferralCount
+	lw.WeekendStart,
+	CAST(r.ReferralCreatedDateTime AS DATE) AS [Date],
+    COUNT(r.Id) AS NumberOfBreaches
 FROM LastWeekend lw
 LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-    AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
     AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM	
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
-	AND r.BreachReasonId is NOT null
+	AND r.BreachReasonId IS NOT NULL
 GROUP BY
-    lw.WeekendStart
-ORDER BY
-    lw.WeekendStart;
+	lw.WeekendStart,
+    CAST(r.ReferralCreatedDateTime AS DATE)
+ORDER BY 
+    CAST(r.ReferralCreatedDateTime AS DATE);
 "

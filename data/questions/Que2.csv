@@ -1,1735 +1,1480 @@
 question,sql
-How many referrals were reported per hour from Friday to 0600hrs Monday in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were reported per hour from Friday to 0600hrs Monday in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you provide hourly referral data from Friday to 0600hrs on Monday for the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you provide hourly referral data from Friday to 0600hrs on Monday for the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What was the hourly breakdown of referrals in the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What was the hourly breakdown of referrals in the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were logged each hour from Friday to 0600hrs Monday in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were logged each hour from Friday to 0600hrs Monday in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the referral counts per hour for the force area between Friday and 0600hrs Monday.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the referral counts per hour for the force area between Friday and 0600hrs Monday.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you share the number of referrals per hour in the force area from Friday to Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you share the number of referrals per hour in the force area from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What were the hourly referral figures in the force area from Friday through Monday morning 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What were the hourly referral figures in the force area from Friday through Monday morning 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the number of referrals for each hour from Friday to 0600hrs Monday in the force area.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the number of referrals for each hour from Friday to 0600hrs Monday in the force area.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were received per hour from Friday to 0600hrs Monday within the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were received per hour from Friday to 0600hrs Monday within the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can I get the referral data per hour in the force area from Friday until 0600hrs on Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can I get the referral data per hour in the force area from Friday until 0600hrs on Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What was the hourly referral count from Friday to Monday 0600hrs in the force’s area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What was the hourly referral count from Friday to Monday 0600hrs in the force’s area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the referral totals per hour from Friday through to 0600hrs on Monday for the force area.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the referral totals per hour from Friday through to 0600hrs on Monday for the force area.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals came in per hour in the force area between Friday and Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals came in per hour in the force area between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What is the referral breakdown per hour in the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What is the referral breakdown per hour in the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were recorded per hour from Friday to Monday morning 0600hrs in the force jurisdiction?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were recorded per hour from Friday to Monday morning 0600hrs in the force jurisdiction?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you give me the hourly referral statistics for the force area between Friday and 0600hrs on Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you give me the hourly referral statistics for the force area between Friday and 0600hrs on Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What were the referral numbers per hour in the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What were the referral numbers per hour in the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the hourly referral breakdown in the force area from Friday until Monday 0600hrs.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the hourly referral breakdown in the force area from Friday until Monday 0600hrs.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were filed each hour in the force region from Friday to 0600hrs on Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were filed each hour in the force region from Friday to 0600hrs on Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What was the total number of referrals per hour in the force area from Friday through to Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What was the total number of referrals per hour in the force area from Friday through to Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you provide the referral count for each hour in the force area between Friday and 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you provide the referral count for each hour in the force area between Friday and 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What is the referral count per hour for the force jurisdiction from Friday to Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What is the referral count per hour for the force jurisdiction from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Share the hourly referral data from Friday to 0600hrs on Monday in the force area.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Share the hourly referral data from Friday to 0600hrs on Monday in the force area.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were received per hour from Friday to Monday 0600hrs in the force region?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were received per hour from Friday to Monday 0600hrs in the force region?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the hourly referral figures from Friday to Monday 0600hrs in the force area.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the hourly referral figures from Friday to Monday 0600hrs in the force area.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What is the referral count each hour in the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What is the referral count each hour in the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Could you give me the referral breakdown per hour from Friday to Monday morning 0600hrs in the force jurisdiction?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Could you give me the referral breakdown per hour from Friday to Monday morning 0600hrs in the force jurisdiction?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were reported each hour in the force area between Friday and Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were reported each hour in the force area between Friday and Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What were the hourly referral numbers from Friday to 0600hrs Monday in the force's region?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What were the hourly referral numbers from Friday to 0600hrs Monday in the force's region?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the number of referrals logged per hour in the force area from Friday to Monday 0600hrs.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the number of referrals logged per hour in the force area from Friday to Monday 0600hrs.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were recorded per hour between Friday and 0600hrs Monday in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were recorded per hour between Friday and 0600hrs Monday in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you share the referral totals per hour for the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you share the referral totals per hour for the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What are the referral numbers for each hour from Friday until Monday 0600hrs in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What are the referral numbers for each hour from Friday until Monday 0600hrs in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the hourly referral figures from Friday through Monday 0600hrs for the force jurisdiction.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the hourly referral figures from Friday through Monday 0600hrs for the force jurisdiction.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were logged in the force area for each hour from Friday until 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were logged in the force area for each hour from Friday until 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What were the referral counts per hour from Friday to Monday 0600hrs in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What were the referral counts per hour from Friday to Monday 0600hrs in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were made in the force jurisdiction per hour from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were made in the force jurisdiction per hour from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can I get the referral data for each hour in the force area from Friday until 0600hrs on Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can I get the referral data for each hour in the force area from Friday until 0600hrs on Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the hourly referral breakdown from Friday to Monday 0600hrs in the force region.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the hourly referral breakdown from Friday to Monday 0600hrs in the force region.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were received per hour in the force jurisdiction from Friday to Monday 0600hrs?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were received per hour in the force jurisdiction from Friday to Monday 0600hrs?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What is the hourly referral count from Friday to 0600hrs on Monday in the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What is the hourly referral count from Friday to 0600hrs on Monday in the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you share the referral numbers per hour from Friday to Monday morning 0600hrs in the force region?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you share the referral numbers per hour from Friday to Monday morning 0600hrs in the force region?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the referral data per hour in the force area from Friday through to 0600hrs on Monday.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the referral data per hour in the force area from Friday through to 0600hrs on Monday.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were registered in the force area for each hour from Friday until 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were registered in the force area for each hour from Friday until 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What were the total referrals per hour from Friday to 0600hrs Monday in the force's jurisdiction?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What were the total referrals per hour from Friday to 0600hrs Monday in the force's jurisdiction?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Can you provide the hourly referral figures from Friday to Monday 0600hrs for the force area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Can you provide the hourly referral figures from Friday to Monday 0600hrs for the force area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What was the referral count each hour from Friday to Monday morning 0600hrs in the force region?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What was the referral count each hour from Friday to Monday morning 0600hrs in the force region?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-How many referrals were reported each hour in the force area from Friday to 0600hrs Monday?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+How many referrals were reported each hour in the force area from Friday to 0600hrs Monday?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-Provide the hourly referral numbers in the force area from Friday through 0600hrs Monday.,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+Provide the hourly referral numbers in the force area from Friday through 0600hrs Monday.,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-What is the total referral count per hour from Friday to Monday 0600hrs in the force’s area?,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+What is the total referral count per hour from Friday to Monday 0600hrs in the force’s area?,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "
-then per hour please,"WITH
-    LastWeekend
-    AS
-    (
-        -- Calculate the previous Friday (even if today is after Monday)
-        SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
-    )
+then per hour please,"WITH LastWeekend AS (
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
+)
+
 SELECT
     lw.WeekendStart,
-    -- Extract the date of the referral
-    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralDate,
-    -- Display the ReferralHour as the raw hour (e.g., '5' for 5 AM, '14' for 2 PM)
-    CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)) AS ReferralHour,
+    CAST(r.ReferralCreatedDateTime AS DATE) AS ReferralCreatedDate,
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2) AS ReferralHour,  -- Ensures two-digit hour
     COUNT(r.ReferralCreatedDateTime) AS ReferralCount
 FROM LastWeekend lw
-    LEFT JOIN Referrals r
-    ON r.ReferralCreatedDateTime >= lw.WeekendStart
-        AND r.ReferralCreatedDateTime < DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
-        AND (
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
         -- Capture Fridays through Mondays before 6 AM
         DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
         OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
-        OR (DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6) -- Monday before 6 AM
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
     )
 GROUP BY 
     lw.WeekendStart,
     CAST(r.ReferralCreatedDateTime AS DATE),
-    DATEPART(HOUR, r.ReferralCreatedDateTime)
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2)  -- Ensures two-digit hour
 ORDER BY 
-    lw.WeekendStart,
-    ReferralDate,
-    ReferralHour;
+    CAST(r.ReferralCreatedDateTime AS DATE),
+    RIGHT('0' + CAST(DATEPART(HOUR, r.ReferralCreatedDateTime) AS VARCHAR(2)), 2);
 "

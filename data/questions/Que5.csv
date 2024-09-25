@@ -44,11 +44,11 @@ What is the estimated number of referrals for the next two years over the same w
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -60,12 +60,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -77,7 +77,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you project the referral numbers for the same weekend over the next two years?,"WITH WeekendData AS (
@@ -125,11 +125,11 @@ Can you project the referral numbers for the same weekend over the next two year
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -141,12 +141,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -158,7 +158,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What would be the predicted referral count for the same weekend in the next two years?,"WITH WeekendData AS (
@@ -206,11 +206,11 @@ What would be the predicted referral count for the same weekend in the next two 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -222,12 +222,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -239,7 +239,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 "Based on current trends, what’s the estimated referral total for the same weekend over the next two years?","WITH WeekendData AS (
@@ -287,11 +287,11 @@ ORDER BY Year;
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -303,12 +303,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -320,7 +320,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you estimate the referral figures for the same weekend for the next two years using the data?,"WITH WeekendData AS (
@@ -368,11 +368,11 @@ Can you estimate the referral figures for the same weekend for the next two year
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -384,12 +384,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -401,7 +401,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals are expected for the same weekend in the next two years based on current data?,"WITH WeekendData AS (
@@ -449,11 +449,11 @@ How many referrals are expected for the same weekend in the next two years based
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -465,12 +465,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -482,7 +482,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What are the projected referral numbers for the same weekend over the next two years?,"WITH WeekendData AS (
@@ -530,11 +530,11 @@ What are the projected referral numbers for the same weekend over the next two y
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -546,12 +546,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -563,7 +563,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals would be estimated for the same weekend in the next two years based on trends?,"WITH WeekendData AS (
@@ -611,11 +611,11 @@ How many referrals would be estimated for the same weekend in the next two years
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -627,12 +627,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -644,7 +644,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you predict the number of referrals over the next two years for the same weekend based on current trends?,"WITH WeekendData AS (
@@ -692,11 +692,11 @@ Can you predict the number of referrals over the next two years for the same wee
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -708,12 +708,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -725,7 +725,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the forecasted referral count for the same weekend in the next two years using current data?,"WITH WeekendData AS (
@@ -773,11 +773,11 @@ What is the forecasted referral count for the same weekend in the next two years
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -789,12 +789,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -806,7 +806,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals should be expected for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
@@ -854,11 +854,11 @@ How many referrals should be expected for the same weekend over the next two yea
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -870,12 +870,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -887,7 +887,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you project referral numbers for the next two years on the same weekend using historical data?,"WITH WeekendData AS (
@@ -935,11 +935,11 @@ Can you project referral numbers for the next two years on the same weekend usin
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -951,12 +951,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -968,7 +968,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the estimated referral total for the same weekend in the next two years?,"WITH WeekendData AS (
@@ -1016,11 +1016,11 @@ What is the estimated referral total for the same weekend in the next two years?
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1032,12 +1032,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1049,7 +1049,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals can be expected on the same weekend over the next two years based on data trends?,"WITH WeekendData AS (
@@ -1097,11 +1097,11 @@ How many referrals can be expected on the same weekend over the next two years b
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1113,12 +1113,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1130,7 +1130,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you forecast the referral count for the next two years over the same weekend?,"WITH WeekendData AS (
@@ -1178,11 +1178,11 @@ Can you forecast the referral count for the next two years over the same weekend
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1194,12 +1194,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1211,7 +1211,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 "Based on historical data, what’s the estimated referral figure for the same weekend over the next two years?","WITH WeekendData AS (
@@ -1259,11 +1259,11 @@ ORDER BY Year;
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1275,12 +1275,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1292,7 +1292,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What would be the expected referral count for the same weekend over the next two years using current data?,"WITH WeekendData AS (
@@ -1340,11 +1340,11 @@ What would be the expected referral count for the same weekend over the next two
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1356,12 +1356,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1373,7 +1373,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you predict how many referrals there will be for the same weekend over the next two years?,"WITH WeekendData AS (
@@ -1421,11 +1421,11 @@ Can you predict how many referrals there will be for the same weekend over the n
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1437,12 +1437,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1454,7 +1454,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals are likely to occur over the same weekend for the next two years based on the data?,"WITH WeekendData AS (
@@ -1502,11 +1502,11 @@ How many referrals are likely to occur over the same weekend for the next two ye
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1518,12 +1518,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1535,7 +1535,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the estimated referral number for the same weekend in the next two years using the data?,"WITH WeekendData AS (
@@ -1583,11 +1583,11 @@ What is the estimated referral number for the same weekend in the next two years
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1599,12 +1599,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1616,7 +1616,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 "Based on current trends, what is the predicted number of referrals for the same weekend over the next two years?","WITH WeekendData AS (
@@ -1664,11 +1664,11 @@ ORDER BY Year;
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1680,12 +1680,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1697,7 +1697,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you estimate the referral count for the same weekend in the next two years using trend data?,"WITH WeekendData AS (
@@ -1745,11 +1745,11 @@ Can you estimate the referral count for the same weekend in the next two years u
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1761,12 +1761,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1778,7 +1778,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What are the predicted referral numbers for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
@@ -1826,11 +1826,11 @@ What are the predicted referral numbers for the same weekend over the next two y
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1842,12 +1842,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1859,7 +1859,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals should be expected for the next two years on the same weekend?,"WITH WeekendData AS (
@@ -1907,11 +1907,11 @@ How many referrals should be expected for the next two years on the same weekend
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1923,12 +1923,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -1940,7 +1940,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you project referral totals for the same weekend over the next two years using the data?,"WITH WeekendData AS (
@@ -1988,11 +1988,11 @@ Can you project referral totals for the same weekend over the next two years usi
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2004,12 +2004,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2021,7 +2021,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals are estimated for the same weekend over the next two years based on current patterns?,"WITH WeekendData AS (
@@ -2069,11 +2069,11 @@ How many referrals are estimated for the same weekend over the next two years ba
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2085,12 +2085,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2102,7 +2102,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What would be the estimated referral count for the same weekend in the next two years based on trends?,"WITH WeekendData AS (
@@ -2150,11 +2150,11 @@ What would be the estimated referral count for the same weekend in the next two 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2166,12 +2166,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2183,7 +2183,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you forecast referral numbers for the same weekend over the next two years using data analysis?,"WITH WeekendData AS (
@@ -2231,11 +2231,11 @@ Can you forecast referral numbers for the same weekend over the next two years u
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2247,12 +2247,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2264,7 +2264,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the expected referral number for the same weekend in the next two years based on current trends?,"WITH WeekendData AS (
@@ -2312,11 +2312,11 @@ What is the expected referral number for the same weekend in the next two years 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2328,12 +2328,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2345,7 +2345,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals will likely be made for the same weekend over the next two years according to the data?,"WITH WeekendData AS (
@@ -2393,11 +2393,11 @@ How many referrals will likely be made for the same weekend over the next two ye
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2409,12 +2409,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2426,7 +2426,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you provide an estimate of the referral count for the same weekend over the next two years?,"WITH WeekendData AS (
@@ -2474,11 +2474,11 @@ Can you provide an estimate of the referral count for the same weekend over the 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2490,12 +2490,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2507,7 +2507,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What are the projected referral numbers for the next two years for the same weekend based on trends?,"WITH WeekendData AS (
@@ -2555,11 +2555,11 @@ What are the projected referral numbers for the next two years for the same week
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2571,12 +2571,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2588,7 +2588,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals would be expected for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
@@ -2636,11 +2636,11 @@ How many referrals would be expected for the same weekend over the next two year
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2652,12 +2652,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2669,7 +2669,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What’s the predicted referral count for the same weekend in the next two years using historical data?,"WITH WeekendData AS (
@@ -2717,11 +2717,11 @@ What’s the predicted referral count for the same weekend in the next two years
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2733,12 +2733,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2750,7 +2750,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you estimate the total number of referrals for the next two years for the same weekend based on current data?,"WITH WeekendData AS (
@@ -2798,11 +2798,11 @@ Can you estimate the total number of referrals for the next two years for the sa
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2814,12 +2814,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2831,7 +2831,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the forecasted referral figure for the next two years for the same weekend using the data?,"WITH WeekendData AS (
@@ -2879,11 +2879,11 @@ What is the forecasted referral figure for the next two years for the same weeke
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2895,12 +2895,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2912,7 +2912,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals should be projected for the same weekend over the next two years according to trends?,"WITH WeekendData AS (
@@ -2960,11 +2960,11 @@ How many referrals should be projected for the same weekend over the next two ye
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2976,12 +2976,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -2993,7 +2993,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you estimate the referral numbers for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
@@ -3041,11 +3041,11 @@ Can you estimate the referral numbers for the same weekend over the next two yea
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3057,12 +3057,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3074,7 +3074,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What are the expected referral figures for the next two years over the same weekend?,"WITH WeekendData AS (
@@ -3122,11 +3122,11 @@ What are the expected referral figures for the next two years over the same week
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3138,12 +3138,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3155,7 +3155,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals are predicted for the next two years for the same weekend based on trends?,"WITH WeekendData AS (
@@ -3203,11 +3203,11 @@ How many referrals are predicted for the next two years for the same weekend bas
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3219,12 +3219,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3236,7 +3236,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you forecast the number of referrals for the same weekend over the next two years based on the data?,"WITH WeekendData AS (
@@ -3284,11 +3284,11 @@ Can you forecast the number of referrals for the same weekend over the next two 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3300,12 +3300,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3317,7 +3317,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the estimated referral total for the next two years on the same weekend based on historical data?,"WITH WeekendData AS (
@@ -3365,11 +3365,11 @@ What is the estimated referral total for the next two years on the same weekend 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3381,12 +3381,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3398,7 +3398,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals should be expected for the next two years over the same weekend based on current data?,"WITH WeekendData AS (
@@ -3446,11 +3446,11 @@ How many referrals should be expected for the next two years over the same weeke
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3462,12 +3462,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3479,7 +3479,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you predict the referral numbers for the same weekend in the next two years using trend analysis?,"WITH WeekendData AS (
@@ -3527,11 +3527,11 @@ Can you predict the referral numbers for the same weekend in the next two years 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3543,12 +3543,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3560,7 +3560,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the expected number of referrals for the same weekend over the next two years based on data trends?,"WITH WeekendData AS (
@@ -3608,11 +3608,11 @@ What is the expected number of referrals for the same weekend over the next two 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3624,12 +3624,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3641,7 +3641,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals are likely to be made for the next two years on the same weekend based on the data?,"WITH WeekendData AS (
@@ -3689,11 +3689,11 @@ How many referrals are likely to be made for the next two years on the same week
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3705,12 +3705,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3722,7 +3722,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you provide an estimated referral count for the same weekend over the next two years using trend data?,"WITH WeekendData AS (
@@ -3770,11 +3770,11 @@ Can you provide an estimated referral count for the same weekend over the next t
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3786,12 +3786,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3803,7 +3803,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 What is the projected referral number for the next two years for the same weekend using data analysis?,"WITH WeekendData AS (
@@ -3851,11 +3851,11 @@ What is the projected referral number for the next two years for the same weeken
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3867,12 +3867,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3884,7 +3884,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 How many referrals should be expected for the same weekend over the next two years using current trends?,"WITH WeekendData AS (
@@ -3932,11 +3932,11 @@ How many referrals should be expected for the same weekend over the next two yea
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3948,12 +3948,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -3965,7 +3965,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 Can you provide a forecast of referral numbers for the same weekend over the next two years based on historical data?,"WITH WeekendData AS (
@@ -4013,11 +4013,11 @@ Can you provide a forecast of referral numbers for the same weekend over the nex
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -4029,12 +4029,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -4046,7 +4046,7 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "
 If looking at the data what would be the estimated number for referrals for the next two years over the same weekend,"WITH WeekendData AS (
@@ -4094,11 +4094,11 @@ If looking at the data what would be the estimated number for referrals for the 
         CAST(ThisWeekend.ThisWeekendReferrals * 1.10 AS DECIMAL(10, 2)) AS ProjectedReferralCount -- Assuming a 10% growth
     FROM ThisWeekend
 )
-
+ 
 -- Combine and compare the results
 SELECT 
     ThisWeekend.ThisWeekendReferrals AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     ThisWeekend.ThisWeekendYear AS Year,
     CASE 
         WHEN ThisWeekend.ThisWeekendReferrals > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -4110,12 +4110,12 @@ SELECT
 FROM 
     ThisWeekend,
     PreviousWeekends
-
+ 
 UNION ALL
-
+ 
 SELECT 
     FutureProjections.ProjectedReferralCount AS Referrals,
-    PreviousWeekends.AvgPreviousWeekendReferrals AS AvgPreviousWeekends,
+    PreviousWeekends.AvgPreviousWeekendReferrals,
     FutureProjections.ProjectedYear AS Year,
     CASE 
         WHEN FutureProjections.ProjectedReferralCount > PreviousWeekends.AvgPreviousWeekendReferrals 
@@ -4127,6 +4127,6 @@ SELECT
 FROM 
     FutureProjections,
     PreviousWeekends
-
+ 
 ORDER BY Year;
 "

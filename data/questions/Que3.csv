@@ -1,919 +1,1378 @@
 question,sql
 How does the referral data from our force area compare to that of other force areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral statistics in this force area to those in other forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the number of referrals in our force area compare to similar forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the referral rate in this force area compared to other regions?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you provide a comparison of referrals between our force and other forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does our force's referral data measure up against other force areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referrals in this force area compare to those in neighboring force areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral trends in this force area with other forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral count from this force compare to other similar force areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the difference in referral numbers between our force and other forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral volume in this force area compare to other regions?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you show how the referral rates in this force compare to other forces over the same period?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do our force's referral statistics stack up against those of other regions?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral data in this area compare to other force areas for the same timeframe?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What are the differences in referral numbers between this force and other forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral data from our force with similar forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral rates in our force area compare to other forces over the same period?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral figures from our force area compare to nearby forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the referral rate in this force area versus others?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you provide a comparison of referral numbers between this force and others in the region?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral count in this force area compare to forces with similar demographics?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral numbers in this force area stack up against national averages?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral trends in this force to others of similar size?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does this force area’s referral rate compare to forces in neighboring areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do referral statistics in this force compare to other regions over the same time period?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the comparison between referral numbers in this force area and other larger forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does this force's referral data compare to forces in similar-sized cities?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral count in this force compare to other forces with similar populations?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare referral data for this force area to national averages?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral figures in our force area compare with those in the rest of the country?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What’s the referral rate in our force compared to others of similar scale?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does our force area’s referral data compare to forces with similar crime rates?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the number of referrals in this force to those in other regions?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral rate in this force compare to larger forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What are the referral trends in this force area compared to others with similar characteristics?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral volume in our force stack up against other metropolitan forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral numbers in our force area with other rural forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral statistics in our force compare to those in larger forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral rate in this force compare to forces with similar urban populations?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare referral data from our force area with the national average?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral count in this force compare to others of a similar size?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the difference between this force's referral data and other regions with a similar population?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does this force’s referral volume compare to other forces in the country?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral data from this force area to those with similar demographic profiles?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral statistics from this force area compare to other high-crime forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does the referral rate in this force compare with other forces in rural areas?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 Can you compare the referral counts in this force with those in neighboring forces?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How does our force's referral data compare with those from other forces in the same region?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 How do the referral statistics from our force area compare with national figures?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 What is the referral rate in this force area compared to other forces with similar crime patterns?,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
 From the data you have how does that compare to other force areas,"WITH LastWeekend AS (
-    -- Calculate the most recent Friday
-    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)) AS WeekendStart,
-           -- Calculate the following Monday before 6 AM
-           DATEADD(HOUR, 6, DATEADD(DAY, 3, DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7) - 7, CAST(GETDATE() AS DATETIME)))) AS WeekendEnd
+    -- Calculate the previous Friday (even if today is after Monday)
+    SELECT DATEADD(DAY, -((DATEPART(WEEKDAY, GETDATE()) + 1) % 7), CAST(GETDATE() AS DATE)) AS WeekendStart
 )
  
-SELECT 
-    p.[Name] AS ForceArea, -- Police Force Area
-    COUNT(r.Id) AS NumberOfReferrals
-FROM Referrals r
-JOIN PoliceForceLocations pl ON pl.Id = r.CustodyLocationId
-JOIN PoliceForces p ON p.Id = pl.PoliceForceId
-JOIN LastWeekend lw ON r.ReferralCreatedDateTime >= lw.WeekendStart
-                    AND r.ReferralCreatedDateTime < lw.WeekendEnd
-GROUP BY p.Id, p.[Name]
-ORDER BY ForceArea;
+SELECT
+	pf.[Name] AS ForceArea,
+    COUNT(r.ReferralCreatedDateTime) AS NumberOfReferrals
+FROM LastWeekend lw
+LEFT JOIN Referrals r
+    ON CAST(r.ReferralCreatedDateTime AS DATE) >= lw.WeekendStart
+    AND CAST(r.ReferralCreatedDateTime AS DATE) <= DATEADD(DAY, 3, lw.WeekendStart) -- From Friday to Monday before 6 AM
+    AND (
+        -- Capture Fridays through Mondays before 6 AM
+        DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 6 -- Friday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 7 -- Saturday
+        OR DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 1 -- Sunday
+        OR ((DATEPART(WEEKDAY, r.ReferralCreatedDateTime) = 2 AND DATEPART(HOUR, r.ReferralCreatedDateTime) < 6)) -- Monday before 6 AM
+    )
+JOIN PoliceForceLocations As pfl ON pfl.Id = r.CustodyLocationId
+JOIN PoliceForces AS pf ON pf.Id = pfl.PoliceForceId
+
+GROUP BY
+    pf.[Name]
+ORDER BY 
+    pf.[Name];
 "
